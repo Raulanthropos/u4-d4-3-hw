@@ -2,8 +2,10 @@
 import express from "express" // NEW IMPORT SYNTAX (do not forget to add type: "module" to package.json to use this!!)
 import listEndpoints from "express-list-endpoints"
 import cors from "cors"
+import { join } from "path"
 import usersRouter from "./api/users/index.js"
 import booksRouter from "./api/books/index.js"
+import filesRouter from "./api/files/index.js"
 import {
   genericErrorHandler,
   notFoundHandler,
@@ -14,6 +16,8 @@ import {
 const server = express()
 
 const port = 3001
+
+const publicFolderPath = join(process.cwd(), "./public")
 
 // ***************** MIDDLEWARES ********************
 
@@ -33,6 +37,7 @@ const loggerMiddleware = (req, res, next) => {
   }
 } */
 
+server.use(express.static(publicFolderPath))
 server.use(cors()) // Just to let FE communicate with BE successfully
 server.use(loggerMiddleware)
 /* server.use(policeOfficerMiddleware) */
@@ -41,6 +46,7 @@ server.use(express.json()) // If you do not add this line here BEFORE the endpoi
 // ****************** ENDPOINTS *********************
 server.use("/users", loggerMiddleware, usersRouter) // All users related endpoints will share the same /users prefix in their urls
 server.use("/books", loggerMiddleware, booksRouter)
+server.use("/files", loggerMiddleware, filesRouter)
 
 // ****************** ERROR HANDLERS ****************
 server.use(badRequestHandler) // 400

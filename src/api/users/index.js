@@ -15,6 +15,7 @@ import fs from "fs" // CORE MODULE (no need to install it!!!)
 import { fileURLToPath } from "url" // CORE MODULE
 import { dirname, join } from "path" // CORE MODULE
 import uniqid from "uniqid" // 3RD PARTY MODULE (npm i uniqid)
+import { getUsers } from "../../lib/fs-tools.js"
 
 const usersRouter = express.Router() // an Express Router is a set of similar endpoints grouped in the same collection
 
@@ -67,13 +68,12 @@ usersRouter.get("/", (req, res) => {
 })
 
 // 3. GET http://localhost:3001/users/:userId
-usersRouter.get("/:userId", (req, res) => {
+usersRouter.get("/:userId", async (req, res) => {
   // 1. Obtain the userId from the URL
   const userId = req.params.userId
-  console.log("USER ID: ", userId)
 
   // 2. Read the file --> obtaining an array
-  const usersArray = JSON.parse(fs.readFileSync(usersJSONPath))
+  const usersArray = await getUsers()
 
   // 3. Find the specified user in the array
   const user = usersArray.find(user => user.id === userId)
