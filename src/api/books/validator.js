@@ -1,6 +1,8 @@
 import { checkSchema, validationResult } from "express-validator"
 import createHttpError from "http-errors"
 
+const { BadRequest, NotFound } = createHttpError
+
 const bookSchema = {
   title: {
     in: ["body"],
@@ -22,7 +24,7 @@ const bookSchema = {
   }, */
 }
 
-export const checksBooksSchema = checkSchema(bookSchema)
+export const checksBooksSchema = checkSchema(bookSchema) // attach to the current req an array of errors
 
 export const triggerBadRequest = (req, res, next) => {
   // 1. Check if previous middleware ( checksBooksSchema) has detected any error in req.body
@@ -32,7 +34,7 @@ export const triggerBadRequest = (req, res, next) => {
 
   if (!errors.isEmpty()) {
     // 2.1 If we have any error --> trigger error handler 400
-    next(createHttpError(400, "Errors during book validation", { errorsList: errors.array() }))
+    next(BadRequest("Errors during book validation", { errorsList: errors.array() }))
   } else {
     // 2.2 Else (no errors) --> normal flow (next)
     next()
